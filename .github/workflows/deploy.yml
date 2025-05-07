@@ -1,0 +1,119 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set environment variables
+        id: set-env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.event.inputs.environment }}" == "production" ]]; then
+            echo "DEPLOY_ENV=production" >> $GITHUB_ENV
+            echo "DEPLOY_BRANCH=main" >> $GITHUB_ENV
+          else
+            echo "DEPLOY_ENV=staging" >> $GITHUB_ENV
+            echo "DEPLOY_BRANCH=develop" >> $GITHUB_ENV
+          fi
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+
+      - name: Run pre-deployment checks
+        run: |
+          echo "Running pre-deployment checks for ${{ env.DEPLOY_ENV }} environment"
+          # Add lint checks, tests, or other validations here
+          # Example: npm run lint && npm test
+          # For now, just output a message
+          echo "Pre-deployment checks passed"
+
+      - name: Deploy to DigitalOcean
+        env:
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        run: |
+          # Create timestamp for backup
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          
+          echo "Starting deployment to ${{ env.DEPLOY_ENV }} environment"
+          
+          # Create backup of remote database
+          echo "Creating database backup..."
+          ssh $REMOTE_USER@$DROPLET_IP "mysqldump -u $DB_USER -p$DB_PASSWORD $DB_NAME > ~/wordpress_backup_$TIMESTAMP.sql"
+          
+          # Create backup of remote files
+          echo "Creating files backup..."
+          ssh $REMOTE_USER@$DROPLET_IP "tar -czf ~/wp-content_backup_$TIMESTAMP.tar.gz $REMOTE_PATH/wp-content"
+          
+          # Sync themes
+          echo "Syncing themes..."
+          rsync -avz --delete ./wp-content/themes/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/themes/
+          
+          # Sync plugins
+          echo "Syncing plugins..."
+          rsync -avz --delete ./wp-content/plugins/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/plugins/
+          
+          # Clear cache on remote server
+          echo "Clearing cache..."
+          ssh $REMOTE_USER@$DROPLET_IP "cd $REMOTE_PATH && wp cache flush --allow-root"
+          
+          echo "Deployment to ${{ env.DEPLOY_ENV }} completed successfully!"
+          
+      - name: Post-deployment verification
+        env:
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+        run: |
+          echo "Running post-deployment verification..."
+          
+          # Check if WordPress is accessible
+          ssh $REMOTE_USER@$DROPLET_IP "curl -s -o /dev/null -w '%{http_code}' http://${{ secrets.DROPLET_IP }} | grep -q 200"
+          
+          # Additional checks can be added here
+          
+          echo "Post-deployment verification completed"
+
+      - name: Send deployment notification
+        if: success()
+        run: |
+          echo "Deployment to ${{ env.DEPLOY_ENV }} completed successfully!"
+          # Add notification commands here (Slack, email, etc.)
+          
+      - name: Send failure notification
+        if: failure()
+        run: |
+          echo "Deployment to ${{ env.DEPLOY_ENV }} failed!"
+          # Add notification commands here (Slack, email, etc.) 

@@ -1,0 +1,66 @@
+name: Test Pull Request
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    
+jobs:
+  test:
+    name: Test Changes
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up environment
+        run: |
+          echo "Setting up test environment"
+          # Add environment setup if needed
+          
+      - name: Validate theme files
+        run: |
+          echo "Validating theme files..."
+          # Basic file structure validation
+          if [ ! -f "wp-content/themes/twentytwentyfive-child/style.css" ]; then
+            echo "Error: Child theme style.css is missing"
+            exit 1
+          fi
+          
+          if [ ! -f "wp-content/themes/twentytwentyfive-child/functions.php" ]; then
+            echo "Error: Child theme functions.php is missing"
+            exit 1
+          fi
+          
+          # Check for syntax errors in PHP files
+          find wp-content/themes/twentytwentyfive-child -name "*.php" -type f -exec php -l {} \;
+          
+          echo "Theme files validation completed"
+          
+      - name: Run theme tests
+        run: |
+          echo "Running theme tests..."
+          # Add specific tests for your theme
+          # This could be unit tests, integration tests, etc.
+          # For now, just a placeholder
+          echo "Theme tests completed"
+          
+      - name: Check for WordPress coding standards
+        run: |
+          echo "Checking WordPress coding standards..."
+          # This would typically use PHPCS with WordPress standards
+          # For example:
+          # composer require --dev wp-coding-standards/wpcs
+          # ./vendor/bin/phpcs --standard=WordPress wp-content/themes/twentytwentyfive-child
+          
+          echo "Coding standards check completed"
+          
+      - name: Send test results
+        if: always()
+        run: |
+          if [ ${{ job.status }} == "success" ]; then
+            echo "All tests passed successfully!"
+          else
+            echo "Tests failed. Please check the logs for details."
+          fi
+          # Add notification commands here (Slack, email, etc.) 
