@@ -20,6 +20,8 @@ Our primary deployment strategy uses GitHub Actions for automated, version-contr
 - **`develop` branch**: Staging environment
 - **Feature branches**: Development only, no direct deployment
 
+> **Note**: For details on setting up branch protection rules, see our [GitHub Branch Protection Guide](./guide-github-branch-protection.md).
+
 ### Workflow
 
 1. **Development**: Create a feature branch from `develop`

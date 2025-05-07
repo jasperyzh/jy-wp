@@ -101,9 +101,11 @@ This child theme approach allows us to make customizations without affecting the
 - [x] Set up CI/CD pipeline
 - [x] Document deployment procedures
 - [x] Test deployment, update functions.php on child-theme as test
-- [ ] Implement Git-based deployment workflow
-- [ ] Configure branch protection rules
+- [x] Implement Git-based deployment workflow
+- [x] Configure branch protection rules
 - [ ] Setup review process for deployment changes
+
+> **Note**: See [GitHub Branch Protection Guide](./guide-github-branch-protection.md) and [GitHub Secrets Guide](./guide-github-secrets.md) for detailed setup instructions.
 
 ### 6. Development Workflow with Vite
 - [ ] setup vite in twentytwentyfive-child theme
@@ -111,12 +113,12 @@ This child theme approach allows us to make customizations without affecting the
 - [ ] enqueue scripts.js and styles.js from vite production ()
 
 ### 7. Git-Based Deployment Strategy
-- [ ] Finalize GitHub Actions workflow for automated deployments
-- [ ] Implement branch strategy (main → production, develop → staging)
-- [ ] Setup proper SSH key management for secure deployments
-- [ ] Configure pre-deployment testing
-- [ ] Implement post-deployment verification
-- [ ] Document rollback procedures
+- [x] Finalize GitHub Actions workflow for automated deployments
+- [x] Implement branch strategy (main → production, develop → staging)
+- [x] Setup proper SSH key management for secure deployments
+- [x] Configure pre-deployment testing
+- [x] Implement post-deployment verification
+- [x] Document rollback procedures
 
 ### 8. Webhook via WordPress Dashboard
 - [ ] Create a simple astro project in Vercel (1 html landing page)
