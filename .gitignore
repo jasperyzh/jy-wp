@@ -17,6 +17,7 @@ wp-content/backup*/
 wp-content/cache/
 wp-content/plugins/
 wp-content/themes/
+!wp-content/themes/twentytwentyfive-child/
 
 # Logs
 *.log
@@ -26,6 +27,7 @@ access_log
 # Environment files
 .env
 .env.*
+deploy-config.sh
 
 # IDE files
 .idea/
