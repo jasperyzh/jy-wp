@@ -1,0 +1,21 @@
+/*
+Theme Name: Twenty Twenty-Five Child
+Theme URI: https://wordpress.org/themes/twentytwentyfive-child/
+Author: Your Name
+Author URI: https://yourwebsite.com/
+Description: Child theme for Twenty Twenty-Five
+Template: twentytwentyfive
+Version: 1.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: twentytwentyfive-child
+Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, rtl-language-support, theme-options, threaded-comments, translation-ready, wide-blocks
+*/
+
+/* Import parent theme styles */
+@import url('../twentytwentyfive/style.css');
+
+/* Add your custom styles below this line */
+body {
+    /* Custom styles for demonstration */
+} 
