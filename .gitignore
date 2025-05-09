@@ -53,4 +53,7 @@ Thumbs.db
 # Node.js
 node_modules/
 dist/
-.vite/ 
+.vite/
+
+# Vite development mode flag file
+wp-content/themes/twentytwentyfive-child/.vite-dev-server 
