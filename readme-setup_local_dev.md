@@ -155,11 +155,12 @@ We've configured a reliable deployment process with three options:
 3. **Automated deployment** using GitHub Actions
 
 These deployment methods include:
-- Automatic backups before deployment
-- Synchronization of theme files
-- Cache clearing after deployment
+- Automatic backups before deployment (only of files being modified)
+- Targeted synchronization of only modified theme/plugin files
+- Non-destructive deployment (preserves existing files not in repository)
 - Protection of parent themes during deployment
 - Automatic installation of required parent themes if missing
+- Cache clearing after deployment
 
 For maximum reliability and version control, we're transitioning to a fully Git-based deployment strategy using GitHub Actions, which offers these additional benefits:
 - Complete version history
