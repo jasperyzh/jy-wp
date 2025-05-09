@@ -24,6 +24,7 @@ services:
       - "8000:80"
     restart: always
     volumes:
+      - ./wp-config.php:/var/www/html/wp-config.php
       - ./wp-content:/var/www/html/wp-content
     environment:
       WORDPRESS_DB_HOST: db:3306
