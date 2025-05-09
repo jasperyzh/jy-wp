@@ -21,6 +21,18 @@ function twentytwentyfive_child_custom_footer() {
     echo '<div class="custom-footer-text" style="text-align: center; padding: 1rem 0; font-size: 0.8rem; background-color: #f5f5f5; margin-top: 2rem;">';
     echo '© ' . date('Y') . ' My WordPress Site - Updated for Deployment Test on ' . date('F j, Y H:i:s');
     echo '<br>Deployed via GitHub Actions CI/CD Pipeline';
+    echo '<div class="deployment-cube-container">';
+    echo '<div class="deployment-cube">';
+    echo '<span>Deployed Cube</span>';
+    echo '<div class="cube-face front"></div>';
+    echo '<div class="cube-face back"></div>';
+    echo '<div class="cube-face right"></div>';
+    echo '<div class="cube-face left"></div>';
+    echo '<div class="cube-face top"></div>';
+    echo '<div class="cube-face bottom"></div>';
+    echo '</div>';
+    echo '</div>';
+    
     echo '</div>';
 }
 add_action('wp_footer', 'twentytwentyfive_child_custom_footer');
