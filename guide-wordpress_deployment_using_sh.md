@@ -212,20 +212,42 @@ rsync: [generator] failed to set times on "/var/www/html/wp-content/themes/.": O
 rsync error: some files/attrs were not transferred (see previous errors) (code 23)
 ```
 
-This is because the rsync process doesn't have sufficient permissions to modify file timestamps or permissions on the server. To fix this issue, add these flags to your rsync commands:
+This is because the rsync process doesn't have sufficient permissions to modify file timestamps or permissions on the server. rsync exit code 23 actually indicates "partial success" - most files transferred correctly, but some attributes couldn't be set.
+
+#### Best Practice for WordPress Deployments with rsync
+
+The most reliable rsync configuration for WordPress deployments:
 
 ```bash
-# For GitHub Actions workflow
-rsync -avz --delete --omit-dir-times --no-perms ./wp-content/themes/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/themes/
+rsync -rlptzv --delete --omit-dir-times --no-perms --chmod=ugo=rwX ./local/path/ user@server:/remote/path/ || [ $? -eq 23 ]
 ```
 
-The flags do the following:
-- `--omit-dir-times`: Don't try to update directory timestamps
-- `--no-perms`: Don't try to preserve file permissions
+This command:
+- Uses `-rlptzv` instead of `-avz` to be more explicit about which attributes to preserve
+- Adds `--chmod=ugo=rwX` to set sensible permissions on uploaded files
+- Adds `|| [ $? -eq 23 ]` to ignore the common "partial success" exit code
+- Includes `--omit-dir-times --no-perms` to avoid permission errors
 
-For manual deployments or scripts, you can use the same flags:
+For GitHub Actions workflows:
+```yaml
+- name: Sync theme files
+  run: |
+    rsync -rlptzv --delete --omit-dir-times --no-perms --chmod=ugo=rwX ./wp-content/themes/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/themes/ || [ $? -eq 23 ]
+```
+
+#### Alternative Approach: Using tar for Deployment
+
+If rsync continues to cause issues, consider using tar for deployment:
+
 ```bash
-rsync -avz --delete --omit-dir-times --no-perms ./local/path/ user@server:/remote/path/
+# Create archive locally
+tar -czf deploy.tar.gz ./wp-content/themes/
+
+# Transfer to server
+scp deploy.tar.gz $REMOTE_USER@$DROPLET_IP:~/
+
+# Extract on server
+ssh $REMOTE_USER@$DROPLET_IP "cd $REMOTE_PATH && tar -xzf ~/deploy.tar.gz"
 ```
 
-These options allow rsync to successfully sync the files even when it can't modify certain metadata attributes like timestamps or permissions. 
+This approach bypasses permission issues during transfer and can be more reliable in some environments. 
