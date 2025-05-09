@@ -103,11 +103,11 @@ jobs:
           fi
           
           # Sync only custom plugins (if present)
-          if [ -d "./wp-content/plugins/custom-plugin/" ]; then
-            echo "Syncing custom plugins..."
-            rsync -avz ./wp-content/plugins/custom-plugin/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/plugins/custom-plugin/
+          if [ -d "./wp-content/plugins/vercel-rebuild-trigger/" ]; then
+            echo "Syncing vercel-rebuild-trigger plugin..."
+            rsync -avz ./wp-content/plugins/vercel-rebuild-trigger/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/plugins/vercel-rebuild-trigger/
           else
-            echo "No custom plugins directory found for deployment"
+            echo "No vercel-rebuild-trigger plugin directory found for deployment"
           fi
           
           # Clear cache on remote server
