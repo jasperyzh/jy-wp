@@ -11,8 +11,77 @@ function twentytwentyfive_child_enqueue_styles() {
         array('twentytwentyfive-style'),
         wp_get_theme()->get('Version')
     );
+
+    // Enqueue Vite assets - will switch automatically between dev and production
+    twentytwentyfive_child_enqueue_vite_assets();
 }
 add_action('wp_enqueue_scripts', 'twentytwentyfive_child_enqueue_styles');
+
+/**
+ * Enqueue Vite assets in development or production mode
+ */
+function twentytwentyfive_child_enqueue_vite_assets() {
+    // Define constants for Vite development
+    define('VITE_DEV_SERVER', 'http://localhost:3001');
+    define('VITE_DEV_MODE', file_exists(get_stylesheet_directory() . '/.vite-dev-server'));
+
+    if (VITE_DEV_MODE) {
+        // Development mode - use Vite's dev server
+        wp_enqueue_script('vite-client', VITE_DEV_SERVER . '/@vite/client', array(), null, true);
+        wp_enqueue_script('vite-main-js', VITE_DEV_SERVER . '/src/main.js', array(), null, true);
+
+        // Add type="module" to Vite dev server scripts
+        add_filter('script_loader_tag', 'twentytwentyfive_child_vite_module_scripts', 10, 3);
+    } else {
+        // Production mode - use built assets
+        $manifest_path = get_stylesheet_directory() . '/assets/dist/manifest.json';
+        
+        if (file_exists($manifest_path)) {
+            $manifest = json_decode(file_get_contents($manifest_path), true);
+            
+            // Enqueue main JS
+            if (isset($manifest['src/main.js'])) {
+                $main_js = $manifest['src/main.js']['file'];
+                wp_enqueue_script(
+                    'twentytwentyfive-child-js',
+                    get_stylesheet_directory_uri() . '/assets/dist/' . $main_js,
+                    array(),
+                    filemtime(get_stylesheet_directory() . '/assets/dist/' . $main_js),
+                    true
+                );
+            }
+            
+            // Enqueue CSS
+            if (isset($manifest['src/styles.scss'])) {
+                $main_css = $manifest['src/styles.scss']['file'];
+                if (strpos($main_css, '.css') !== false) {
+                    wp_enqueue_style(
+                        'twentytwentyfive-child-vite-css',
+                        get_stylesheet_directory_uri() . '/assets/dist/' . $main_css,
+                        array(),
+                        filemtime(get_stylesheet_directory() . '/assets/dist/' . $main_css)
+                    );
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Adds type="module" to script tags for Vite dev server assets.
+ */
+function twentytwentyfive_child_vite_module_scripts($tag, $handle, $src) {
+    // Scripts to be treated as modules
+    $module_scripts = array('vite-client', 'vite-main-js');
+
+    if (in_array($handle, $module_scripts)) {
+        // Ensure the src is from our Vite dev server
+        if (strpos($src, VITE_DEV_SERVER) === 0) {
+            return '<script type="module" src="' . esc_url($src) . '" id="' . esc_attr($handle) . '-js"></script>';
+        }
+    }
+    return $tag;
+}
 
 /**
  * Add custom footer text

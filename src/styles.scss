@@ -1,0 +1,119 @@
+@use 'sass:color';
+
+// Our custom styles for the WordPress site
+
+// Variables
+$primary-color: #4CAF50;
+$secondary-color: #2196F3;
+$hover-color: #45a049;
+$cube-animation-duration: 8s;
+
+// Utility classes
+.js-loaded {
+  .deployment-cube-container {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+}
+
+// Enhanced styles for our deployment cube
+.deployment-cube-container {
+  width: 80px;
+  height: 80px;
+  perspective: 800px;
+  margin: 2rem auto;
+  position: relative;
+  opacity: 0.8;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  
+  &:hover {
+    opacity: 1;
+  }
+  
+  &::before {
+    content: "Deployment Status";
+    position: absolute;
+    bottom: -25px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+  }
+}
+
+.deployment-cube {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: translateZ(-40px);
+  animation: cube-rotate $cube-animation-duration infinite linear;
+  cursor: pointer;
+  
+  &:hover {
+    animation-duration: $cube-animation-duration * 2;
+  }
+}
+
+.cube-face {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  color: white;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+  
+  &.front {
+    transform: rotateY(0deg) translateZ(40px);
+    background: rgba($primary-color, 0.8);
+    &::after { content: "Front"; }
+  }
+  
+  &.back {
+    transform: rotateY(180deg) translateZ(40px);
+    background: rgba($secondary-color, 0.8);
+    &::after { content: "Back"; }
+  }
+  
+  &.right {
+    transform: rotateY(90deg) translateZ(40px);
+    background: rgba(color.mix($primary-color, $secondary-color, 25%), 0.8);
+    &::after { content: "Right"; }
+  }
+  
+  &.left {
+    transform: rotateY(-90deg) translateZ(40px);
+    background: rgba(color.mix($primary-color, $secondary-color, 75%), 0.8);
+    &::after { content: "Left"; }
+  }
+  
+  &.top {
+    transform: rotateX(90deg) translateZ(40px);
+    background: rgba(color.adjust($primary-color, $lightness: 10%), 0.8);
+    &::after { content: "Top"; }
+  }
+  
+  &.bottom {
+    transform: rotateX(-90deg) translateZ(40px);
+    background: rgba(color.adjust($secondary-color, $lightness: -10%), 0.8);
+    &::after { content: "Bottom"; }
+  }
+}
+
+@keyframes cube-rotate {
+  0% {
+    transform: translateZ(-40px) rotateX(0deg) rotateY(0deg);
+  }
+  100% {
+    transform: translateZ(-40px) rotateX(360deg) rotateY(360deg);
+  }
+} 

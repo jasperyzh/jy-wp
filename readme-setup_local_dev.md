@@ -108,9 +108,47 @@ This child theme approach allows us to make customizations without affecting the
 > **Note**: See [GitHub Branch Protection Guide](./guide-github-branch-protection.md), [GitHub Secrets Guide](./guide-github-secrets.md), and [WordPress Deployment Guide](./guide-wordpress_deployment_using_sh.md) for detailed setup instructions.
 
 ### 6. Development Workflow with Vite
-- [ ] setup vite in twentytwentyfive-child theme
-- [ ] enqueue scripts.js and styles.js from vite development (instant updates or hot reload for quick development)
-- [ ] enqueue scripts.js and styles.js from vite production ()
+- [x] setup vite in twentytwentyfive-child theme
+- [x] enqueue scripts.js and styles.js from vite development (instant updates or hot reload for quick development)
+- [x] enqueue scripts.js and styles.js from vite production thru build-dist?
+
+#### Vite Development Workflow
+
+We've set up Vite for modern frontend development with our WordPress child theme:
+
+1. **Directory Structure**:
+   - `/src/main.js` - Main JavaScript entry point
+   - `/src/styles.scss` - Main stylesheet using SASS
+   - `/dist/` - Temporary build directory (not committed to Git)
+   - `/wp-content/themes/twentytwentyfive-child/assets/dist/` - Final location for built assets
+
+2. **Development Commands**:
+   ```bash
+   # Start development server with hot reloading
+   npm run dev
+   
+   # Build assets for production
+   npm run build
+   
+   # Build assets and copy to theme directory
+   npm run build-theme
+   
+   # Build and watch for changes
+   npm run watch
+   ```
+
+3. **Switching Between Dev and Production**:
+   - Development mode: Create a `.vite-dev-server` file in the theme directory
+   - Production mode: Remove the `.vite-dev-server` file
+
+4. **Permission Handling**:
+   - We build to a local `/dist/` directory first
+   - Then use `copy-to-theme.sh` script to copy with proper permissions
+
+5. **Deployment Process**:
+   - Built files are stored in the theme's `/assets/dist/` directory
+   - These are committed to Git and deployed with the theme
+   - Assets use content hashing for cache busting
 
 ### 7. Git-Based Deployment Strategy
 - [x] Finalize GitHub Actions workflow for automated deployments
@@ -125,6 +163,7 @@ This child theme approach allows us to make customizations without affecting the
 - [x] Configure pre-deployment testing
 - [x] Implement post-deployment verification
 - [x] Document rollback procedures
+- [x] Successfully test deployment pipeline with child theme updates (style.css and functions.php updates)
 
 ### 8. Webhook via WordPress Dashboard
 - [ ] Create a simple astro project in Vercel (1 html landing page)
@@ -200,9 +239,36 @@ This script checks:
 - Document all changes
 
 ## Next Steps
-1. Complete Git-based deployment workflow
-2. Configure branch protection rules
-3. Setup development → staging → production pipeline
-4. Implement automated testing
-5. Document rollback procedures
+1. ✅ Complete Git-based deployment workflow
+2. ✅ Configure branch protection rules
+3. ✅ Setup development → staging → production pipeline
+4. ✅ Document rollback procedures
+5. [ ] Implement automated testing
+6. [ ] Setup Vite in the child theme for development
+7. [ ] Add webhook functionality to WordPress Dashboard
 
+## Deployment Summary
+We've successfully implemented and tested a complete CI/CD pipeline with:
+
+- **GitHub Repository Structure**:
+  - `main` branch: Production environment
+  - `develop` branch: Staging environment
+  - `feature-*` branches: Local development
+
+- **Deployment Process**:
+  - Automated deployments via GitHub Actions
+  - Non-destructive file synchronization (preserves WordPress core and third-party files)
+  - Target-specific deployments (only syncs modified child theme and custom plugins)
+  - Automated parent theme preservation and installation
+  - Pre and post-deployment verification
+
+- **SSH Configuration**:
+  - SSH keys without passphrases for automated deployment
+  - Secure key management via GitHub Secrets
+  - Proper file permissions for SSH directories
+
+- **Frontend Development**:
+  - Vite for modern JavaScript and CSS processing
+  - Development server with hot reloading
+  - Optimized production builds with content hashing
+  - Automatic asset enqueuing in WordPress

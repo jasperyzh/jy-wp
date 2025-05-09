@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WordPress Theme Development with Vite</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>WordPress Theme Development with Vite</h1>
+      <p>This is a standalone development page for your Vite assets.</p>
+      <p>Your changes to JavaScript and SCSS files will be hot-reloaded here.</p>
+      
+      <!-- Test component - Deployment Cube -->
+      <div class="deployment-cube-container">
+        <div class="deployment-cube">
+          <div class="cube-face front"></div>
+          <div class="cube-face back"></div>
+          <div class="cube-face right"></div>
+          <div class="cube-face left"></div>
+          <div class="cube-face top"></div>
+          <div class="cube-face bottom"></div>
+        </div>
+      </div>
+      
+      <div class="info">
+        <h2>Development Information</h2>
+        <ul>
+          <li>Vite running on: <code>http://localhost:3001</code></li>
+          <li>WordPress running on: <code>http://localhost:8000</code></li>
+        </ul>
+        <p>When you're done developing, run: <code>npm run build-theme</code></p>
+      </div>
+    </div>
+    
+    <script type="module" src="/src/main.js"></script>
+    
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        line-height: 1.6;
+      }
+      #app {
+        text-align: center;
+      }
+      .info {
+        margin-top: 3rem;
+        text-align: left;
+        padding: 1.5rem;
+        background: #f5f5f5;
+        border-radius: 5px;
+      }
+      code {
+        background: #e0e0e0;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+      }
+    </style>
+  </body>
+</html> 

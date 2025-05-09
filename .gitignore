@@ -20,6 +20,11 @@ wp-content/themes/*
 !wp-content/themes/twentytwentyfive-child/
 !wp-content/themes/twentytwentyfive-child/**
 
+# But include the assets/dist directory
+!wp-content/themes/twentytwentyfive-child/assets/
+!wp-content/themes/twentytwentyfive-child/assets/dist/
+!wp-content/themes/twentytwentyfive-child/assets/dist/**
+
 # Logs
 *.log
 error_log
@@ -43,4 +48,9 @@ deploy-config.sh
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
+
+# Node.js
+node_modules/
+dist/
+.vite/ 
