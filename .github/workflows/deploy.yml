@@ -88,7 +88,7 @@ jobs:
           
           # Create backup of remote files
           echo "Creating files backup..."
-          ssh $REMOTE_USER@$DROPLET_IP "tar -czf ~/wp-content_backup_$TIMESTAMP.tar.gz --exclude='$REMOTE_PATH/wp-content/wflogs' $REMOTE_PATH/wp-content"
+          ssh $REMOTE_USER@$DROPLET_IP "tar -czf ~/wp-content_backup_$TIMESTAMP.tar.gz $REMOTE_PATH/wp-content"
           
           # Prepare local directory structure for deployment
           # Add this to make sure our custom theme is properly included
@@ -96,12 +96,12 @@ jobs:
           
           # Sync themes
           echo "Syncing themes..."
-          rsync -rlptzv --delete --omit-dir-times --no-perms --chmod=ugo=rwX ./wp-content/themes/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/themes/ || [ $? -eq 23 ]
+          rsync -avz --exclude="twentytwentyfive" --delete ./wp-content/themes/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/themes/
           
           # Sync plugins (if present)
           if [ -d "./wp-content/plugins/" ]; then
             echo "Syncing plugins..."
-            rsync -rlptzv --delete --exclude="wflogs/" --omit-dir-times --no-perms --chmod=ugo=rwX ./wp-content/plugins/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/plugins/ || [ $? -eq 23 ]
+            rsync -avz --delete ./wp-content/plugins/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/plugins/
           else
             echo "No plugins directory found for deployment"
           fi
@@ -109,6 +109,10 @@ jobs:
           # Clear cache on remote server
           echo "Clearing cache..."
           ssh $REMOTE_USER@$DROPLET_IP "cd $REMOTE_PATH && wp cache flush --allow-root"
+          
+          # Ensure parent theme is installed
+          echo "Ensuring parent theme is installed..."
+          ssh $REMOTE_USER@$DROPLET_IP "cd $REMOTE_PATH && wp theme is-installed twentytwentyfive --allow-root || wp theme install twentytwentyfive --allow-root"
           
           echo "Deployment to ${{ env.DEPLOY_ENV }} completed successfully!"
           

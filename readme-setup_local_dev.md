@@ -158,6 +158,8 @@ These deployment methods include:
 - Automatic backups before deployment
 - Synchronization of theme files
 - Cache clearing after deployment
+- Protection of parent themes during deployment
+- Automatic installation of required parent themes if missing
 
 For maximum reliability and version control, we're transitioning to a fully Git-based deployment strategy using GitHub Actions, which offers these additional benefits:
 - Complete version history
