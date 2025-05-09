@@ -160,4 +160,46 @@ Update your GitHub Actions workflow file to use ssh-agent with your existing key
     ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 ```
 
-This approach works with passphrase-protected keys but requires additional configuration in your workflow file. 
+This approach works with passphrase-protected keys but requires additional configuration in your workflow file.
+
+### Permission Issues with WordFence Logs
+
+If your deployment fails with errors like:
+```
+tar: ***/wp-content/wflogs/config-livewaf.php: Cannot open: Permission denied
+tar: ***/wp-content/wflogs/config-transient.php: Cannot open: Permission denied
+...
+tar: Exiting with failure status due to previous errors
+```
+
+This is because the WordFence plugin creates log files with restricted permissions. You have two options:
+
+#### Option 1: Exclude wflogs directory from backups
+Update your deployment script or GitHub Actions workflow to exclude the wflogs directory from the backup process:
+
+```bash
+# Example for tar command in a bash script
+tar -czf backup_filename.tar.gz --exclude="wp-content/wflogs" /path/to/wordpress
+```
+
+For GitHub Actions, modify the backup command:
+```yaml
+- name: Create files backup
+  run: |
+    ssh ${{ secrets.REMOTE_USER }}@${{ secrets.DROPLET_IP }} "tar -czf ~/wp-content_backup_$(date +%Y%m%d%H%M%S).tar.gz --exclude='/var/www/html/wp-content/wflogs' /var/www/html/wp-content"
+```
+
+#### Option 2: Temporarily adjust permissions (less secure)
+If you need to include WordFence logs in your backups:
+
+```bash
+# Before backup
+ssh user@server "chmod -R 755 /var/www/html/wp-content/wflogs"
+
+# Run backup commands...
+
+# After backup
+ssh user@server "chmod -R 750 /var/www/html/wp-content/wflogs"
+```
+
+For security reasons, Option 1 (excluding the directory) is generally preferred. 
