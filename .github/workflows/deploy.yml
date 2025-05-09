@@ -96,12 +96,12 @@ jobs:
           
           # Sync themes
           echo "Syncing themes..."
-          rsync -avz --delete ./wp-content/themes/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/themes/
+          rsync -avz --delete --omit-dir-times --no-perms ./wp-content/themes/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/themes/
           
           # Sync plugins (if present)
           if [ -d "./wp-content/plugins/" ]; then
             echo "Syncing plugins..."
-            rsync -avz --delete --exclude="wflogs/" ./wp-content/plugins/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/plugins/
+            rsync -avz --delete --exclude="wflogs/" --omit-dir-times --no-perms ./wp-content/plugins/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/plugins/
           else
             echo "No plugins directory found for deployment"
           fi

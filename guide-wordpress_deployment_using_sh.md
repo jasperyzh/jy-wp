@@ -202,4 +202,30 @@ ssh user@server "chmod -R 755 /var/www/html/wp-content/wflogs"
 ssh user@server "chmod -R 750 /var/www/html/wp-content/wflogs"
 ```
 
-For security reasons, Option 1 (excluding the directory) is generally preferred. 
+For security reasons, Option 1 (excluding the directory) is generally preferred.
+
+### Rsync Permission Errors During Deployment
+
+If your deployment fails with errors like:
+```
+rsync: [generator] failed to set times on "/var/www/html/wp-content/themes/.": Operation not permitted (1)
+rsync error: some files/attrs were not transferred (see previous errors) (code 23)
+```
+
+This is because the rsync process doesn't have sufficient permissions to modify file timestamps or permissions on the server. To fix this issue, add these flags to your rsync commands:
+
+```bash
+# For GitHub Actions workflow
+rsync -avz --delete --omit-dir-times --no-perms ./wp-content/themes/ $REMOTE_USER@$DROPLET_IP:$REMOTE_PATH/wp-content/themes/
+```
+
+The flags do the following:
+- `--omit-dir-times`: Don't try to update directory timestamps
+- `--no-perms`: Don't try to preserve file permissions
+
+For manual deployments or scripts, you can use the same flags:
+```bash
+rsync -avz --delete --omit-dir-times --no-perms ./local/path/ user@server:/remote/path/
+```
+
+These options allow rsync to successfully sync the files even when it can't modify certain metadata attributes like timestamps or permissions. 
