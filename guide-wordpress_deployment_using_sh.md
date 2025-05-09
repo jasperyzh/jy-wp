@@ -6,7 +6,7 @@ This document outlines the procedures for deploying WordPress changes from local
 
 ### Method 1: Manual Deployment Using deploy.sh Script
 
-The `deploy.sh` script automates the deployment process, taking care of backups and file synchronization.
+The `deploy.sh` script automates the deployment process, taking care of backups and    file synchronization.
 
 #### Prerequisites:
 - SSH access to the DigitalOcean droplet
@@ -123,3 +123,41 @@ tar -xzf ~/wp-content_backup_TIMESTAMP.tar.gz -C /
 - Use SSH keys instead of passwords
 - Restrict permissions on the production server
 - Consider using a staging environment for testing deployments before going to production 
+
+## Troubleshooting
+
+### SSH Key Passphrase Issues
+
+If your deployment fails with an error like:
+```
+Deploy to staging
+Command failed: ssh-add - Enter passphrase for (stdin):
+```
+
+This means your SSH key is protected with a passphrase that cannot be entered during automated deployment. You have two options:
+
+#### Option 1: Generate a new SSH key without a passphrase (for CI/CD only)
+```bash
+# Generate a deployment-specific SSH key without passphrase
+ssh-keygen -t ed25519 -f ~/.ssh/github_deploy_key -N ""
+
+# Display the public key to add to your server's authorized_keys
+cat ~/.ssh/github_deploy_key.pub
+
+# Display the private key to add to GitHub Secrets
+cat ~/.ssh/github_deploy_key
+```
+
+Add the public key to your server's `~/.ssh/authorized_keys` file, and add the private key as a GitHub Secret named `SSH_PRIVATE_KEY`.
+
+#### Option 2: Configure ssh-agent in GitHub Actions workflow
+Update your GitHub Actions workflow file to use ssh-agent with your existing key:
+
+```yaml
+- name: Set up SSH
+  uses: webfactory/ssh-agent@v0.7.0
+  with:
+    ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+```
+
+This approach works with passphrase-protected keys but requires additional configuration in your workflow file. 

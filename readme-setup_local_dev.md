@@ -103,9 +103,9 @@ This child theme approach allows us to make customizations without affecting the
 - [x] Test deployment, update functions.php on child-theme as test
 - [x] Implement Git-based deployment workflow
 - [x] Configure branch protection rules
-- [ ] Setup review process for deployment changes
+- [x] Setup review process for deployment changes
 
-> **Note**: See [GitHub Branch Protection Guide](./guide-github-branch-protection.md) and [GitHub Secrets Guide](./guide-github-secrets.md) for detailed setup instructions.
+> **Note**: See [GitHub Branch Protection Guide](./guide-github-branch-protection.md), [GitHub Secrets Guide](./guide-github-secrets.md), and [WordPress Deployment Guide](./guide-wordpress_deployment_using_sh.md) for detailed setup instructions.
 
 ### 6. Development Workflow with Vite
 - [ ] setup vite in twentytwentyfive-child theme
@@ -116,6 +116,12 @@ This child theme approach allows us to make customizations without affecting the
 - [x] Finalize GitHub Actions workflow for automated deployments
 - [x] Implement branch strategy (main → production, develop → staging)
 - [x] Setup proper SSH key management for secure deployments
+  - SSH keys without passphrases are required for automated deployments
+  - See the Troubleshooting section in [WordPress Deployment Guide](./guide-wordpress_deployment_using_sh.md)
+  - Add public key to the server:
+    ```bash
+    cat ~/.ssh/github_deploy_key.pub | ssh root@your-droplet-ip "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys"
+    ```
 - [x] Configure pre-deployment testing
 - [x] Implement post-deployment verification
 - [x] Document rollback procedures
